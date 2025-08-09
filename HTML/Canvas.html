@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Editor Canvas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link rel="stylesheet" href="../CSS/estilos.css">
+    <link rel="import" href="../JS/canvas-editor.js">
+    <style>
+        .tool-btn[aria-pressed="true"] {
+            outline: 2px solid #0d6efd;
+        }
+
+        #canvas-wrap {
+            display: grid;
+            place-items: center;
+        }
+
+        #canvas-stage {
+            width: min(95vw, 1100px);
+            height: min(70vh, 650px);
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: .75rem;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+        }
+
+        canvas {
+            background: #fff;
+            border-radius: .5rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, .15);
+            max-width: 100%;
+            max-height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="../index.html">
+                <img src="../Recursos/img/LogoUMGSF.png" alt="Logo U" style="width: 70px;">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            Hoja de Vida
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="../HTML/CV.html">CV</a></li>
+                            <li><a class="dropdown-item" href="../HTML/Video.html">Video Motivacional</a></li>
+                            <li><a class="dropdown-item" href="../HTML/Experiencia.html">Experiencia y Proyectos Realizados</a></li>
+                            <li><a class="dropdown-item" href="../HTML/Materiales.html">Materiales de Programación</a>
+                            </li>
+                        </ul>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            Ejercicios JS
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="../HTML/Canvas.html">Editor Canvas</a></li>
+                        </ul>
+                    </li>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido -->
+    <div class="card shadow-lg p-4 m-4">
+        <div class="card-header text-center">
+            <h2>Editor de Canvas</h2>
+        </div>
+
+        <div class="card-body">
+            <!-- Toolbar -->
+            <div class="row g-3 align-items-center mb-3">
+                <div class="col-12 col-lg-auto">
+                    <div class="btn-group" role="group" aria-label="Herramientas">
+                        <button class="btn btn-outline-primary tool-btn" data-tool="pencil" aria-pressed="true">✏️
+                            Mano</button>
+                        <button class="btn btn-outline-primary tool-btn" data-tool="line">📏 Línea</button>
+                        <button class="btn btn-outline-primary tool-btn" data-tool="rect">▭ Rect</button>
+                        <button class="btn btn-outline-primary tool-btn" data-tool="circle">◯ Círculo</button>
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-auto d-flex align-items-center gap-2">
+                    <label class="form-label mb-0">Color</label>
+                    <input id="color" type="color" class="form-control form-control-color" value="#0f172a"
+                        title="Elegir color">
+                    <label class="form-label mb-0">Grosor</label>
+                    <input id="width" type="range" class="form-range" min="1" max="40" value="4" style="width:150px;">
+                    <div class="form-check ms-1">
+                        <input id="fill" class="form-check-input" type="checkbox" value="">
+                        <label class="form-check-label" for="fill">Relleno</label>
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-auto d-flex align-items-center gap-2">
+                    <input id="file" type="file" class="form-control" accept="image/*" style="max-width:260px;">
+                    <button id="save" class="btn btn-success">💾 Guardar PNG</button>
+                    <button id="clear" class="btn btn-outline-secondary">🧹 Limpiar</button>
+                </div>
+
+                <div class="col-12 col-lg-auto">
+                    <div class="btn-group" role="group" aria-label="Historial">
+                        <button id="undo" class="btn btn-outline-dark" disabled>↶ Deshacer</button>
+                        <button id="redo" class="btn btn-outline-dark" disabled>↷ Rehacer</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Canvas -->
+            <div id="canvas-wrap">
+                <div id="canvas-stage">
+                    <canvas id="canvas" width="1100" height="650"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+        crossorigin="anonymous"></script>
+
+    <!-- Tu JS separado -->
+    <script src="../JS/canvas-editor.js"></script>
+</body>
+
+</html>
